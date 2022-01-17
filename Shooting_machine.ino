@@ -43,8 +43,7 @@ void setup() {
   Serial.begin(Serial_BAUDRATE);
 
   //腳位設定-start----------------------------------------------------------------
-  pinMode(Joystick_switch_PIN, INPUT
-         );
+  pinMode(Joystick_switch_PIN, INPUT);
   pinMode(Joystick_X_PIN, INPUT);
   pinMode(Joystick_Y_PIN, INPUT);
   pinMode(Motor_A_PIN_1, OUTPUT);
@@ -63,12 +62,15 @@ void setup() {
 
 void loop() {
   //射球控制-start----------------------------------------------------------------
-  Serial.print(shotting);
+  Serial.print(digitalRead(Joystick_switch_PIN));
   if (shotting == false) {
-    if (digitalRead(Joystick_switch_PIN) == HIGH) {
-      if (millis() - last_press_time >= shot_timeout) {
+    if (millis() - last_press_time >= shot_timeout) {
+      if (digitalRead(Joystick_switch_PIN) == HIGH) {
         shotting = true;
+        Serial.print("shotting true");
         last_press_time = millis();
+      } else {
+        shotting = false;
       }
     }
   }
@@ -94,6 +96,7 @@ void loop() {
     //關閉馬達-end----------------------------------------------------------------
     //將射球伺服馬達轉動至初始位置
     Servo_A.write(Servo_A_Angle_MIN);
+    //Serial.print("Servo_A_Angle_MIN");
   }
   //射球控制-end----------------------------------------------------------------
 
@@ -107,6 +110,8 @@ void loop() {
   } else if (Joystick_X < 200) {
     Servo_B_angle -= 1;
   }
+  //Serial.print("Servo_B_angle");
+  //Serial.print(Servo_B_angle);
   if (Servo_B_angle > 30) {
     Servo_B_angle = 30;
   } else if (Servo_B_angle < 0) {
@@ -117,9 +122,10 @@ void loop() {
 
   //水平控制-start----------------------------------------------------------------
   Joystick_Y = analogRead(Joystick_Y_PIN);
+  //Serial.print("Y");
+  //Serial.println(Joystick_Y);
   if (Joystick_Y > 500) {
     Servo_C_speed = map(Joystick_Y, 500, 700, 90, 135);
-    Servo_C.write(Servo_C_speed);
   } else if (Joystick_Y < 200) {
     Servo_C_speed = map(Joystick_Y, 0, 200, 45, 90);
   }
